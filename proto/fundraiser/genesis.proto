@@ -2,11 +2,15 @@ syntax = "proto3";
 package christophsj.fundraiser.fundraiser;
 
 // this line is used by starport scaffolding # genesis/proto/import
+import "fundraiser/fund.proto";
+import "fundraiser/project.proto";
 
 option go_package = "github.com/christophsj/fundraiser/x/fundraiser/types";
 
 // GenesisState defines the capability module's genesis state.
 message GenesisState {
     // this line is used by starport scaffolding # genesis/proto/state
+		repeated Fund fundList = 2; // this line is used by starport scaffolding # genesis/proto/stateField
+		repeated Project projectList = 1; // this line is used by starport scaffolding # genesis/proto/stateField
 }
 

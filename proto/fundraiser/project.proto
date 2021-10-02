@@ -1,0 +1,16 @@
+syntax = "proto3";
+package christophsj.fundraiser.fundraiser;
+
+option go_package = "github.com/christophsj/fundraiser/x/fundraiser/types";
+
+import "gogoproto/gogo.proto";
+
+message Project {
+  string creator = 1;
+  uint64 id = 2;
+  string title = 3; 
+  string description = 4; 
+  string start = 5; 
+  string end = 6; 
+  string goal = 7; 
+}

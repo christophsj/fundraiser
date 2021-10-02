@@ -8,6 +8,69 @@ option go_package = "github.com/christophsj/fundraiser/x/fundraiser/types";
 // Msg defines the Msg service.
 service Msg {
     // this line is used by starport scaffolding # proto/tx/rpc
+  rpc CreateFund(MsgCreateFund) returns (MsgCreateFundResponse);
+  rpc UpdateFund(MsgUpdateFund) returns (MsgUpdateFundResponse);
+  rpc DeleteFund(MsgDeleteFund) returns (MsgDeleteFundResponse);
+  rpc CreateProject(MsgCreateProject) returns (MsgCreateProjectResponse);
+  rpc UpdateProject(MsgUpdateProject) returns (MsgUpdateProjectResponse);
+  rpc DeleteProject(MsgDeleteProject) returns (MsgDeleteProjectResponse);
 }
 
 // this line is used by starport scaffolding # proto/tx/message
+message MsgCreateFund {
+  string creator = 1;
+  string project = 2;
+  string amount = 3;
+}
+
+message MsgCreateFundResponse {
+  uint64 id = 1;
+}
+
+message MsgUpdateFund {
+  string creator = 1;
+  uint64 id = 2;
+  string project = 3;
+  string amount = 4;
+}
+
+message MsgUpdateFundResponse { }
+
+message MsgDeleteFund {
+  string creator = 1;
+  uint64 id = 2;
+}
+
+message MsgDeleteFundResponse { }
+
+message MsgCreateProject {
+  string creator = 1;
+  string title = 2;
+  string description = 3;
+  string start = 4;
+  string end = 5;
+  string goal = 6;
+}
+
+message MsgCreateProjectResponse {
+  uint64 id = 1;
+}
+
+message MsgUpdateProject {
+  string creator = 1;
+  uint64 id = 2;
+  string title = 3;
+  string description = 4;
+  string start = 5;
+  string end = 6;
+  string goal = 7;
+}
+
+message MsgUpdateProjectResponse { }
+
+message MsgDeleteProject {
+  string creator = 1;
+  uint64 id = 2;
+}
+
+message MsgDeleteProjectResponse { }

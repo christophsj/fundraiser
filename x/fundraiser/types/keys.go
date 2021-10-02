@@ -20,3 +20,13 @@ const (
 func KeyPrefix(p string) []byte {
 	return []byte(p)
 }
+
+const (
+	ProjectKey      = "Project-value-"
+	ProjectCountKey = "Project-count-"
+)
+
+const (
+	FundKey      = "Fund-value-"
+	FundCountKey = "Fund-count-"
+)

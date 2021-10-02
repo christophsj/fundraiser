@@ -4,12 +4,60 @@ package christophsj.fundraiser.fundraiser;
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 // this line is used by starport scaffolding # 1
+import "fundraiser/fund.proto";
+import "fundraiser/project.proto";
 
 option go_package = "github.com/christophsj/fundraiser/x/fundraiser/types";
 
 // Query defines the gRPC querier service.
 service Query {
     // this line is used by starport scaffolding # 2
+	rpc Fund(QueryGetFundRequest) returns (QueryGetFundResponse) {
+		option (google.api.http).get = "/christophsj/fundraiser/fundraiser/fund/{id}";
+	}
+	rpc FundAll(QueryAllFundRequest) returns (QueryAllFundResponse) {
+		option (google.api.http).get = "/christophsj/fundraiser/fundraiser/fund";
+	}
+
+	rpc Project(QueryGetProjectRequest) returns (QueryGetProjectResponse) {
+		option (google.api.http).get = "/christophsj/fundraiser/fundraiser/project/{id}";
+	}
+	rpc ProjectAll(QueryAllProjectRequest) returns (QueryAllProjectResponse) {
+		option (google.api.http).get = "/christophsj/fundraiser/fundraiser/project";
+	}
+
 }
 
 // this line is used by starport scaffolding # 3
+message QueryGetFundRequest {
+	uint64 id = 1;
+}
+
+message QueryGetFundResponse {
+	Fund Fund = 1;
+}
+
+message QueryAllFundRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllFundResponse {
+	repeated Fund Fund = 1;
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+message QueryGetProjectRequest {
+	uint64 id = 1;
+}
+
+message QueryGetProjectResponse {
+	Project Project = 1;
+}
+
+message QueryAllProjectRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllProjectResponse {
+	repeated Project Project = 1;
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
