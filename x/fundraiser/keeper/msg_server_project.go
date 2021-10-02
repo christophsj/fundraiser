@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/christophsj/fundraiser/x/fundraiser/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -28,44 +27,46 @@ func (k msgServer) CreateProject(goCtx context.Context, msg *types.MsgCreateProj
 }
 
 func (k msgServer) UpdateProject(goCtx context.Context, msg *types.MsgUpdateProject) (*types.MsgUpdateProjectResponse, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
+	return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "Cannot update project!")
+	/*
+		ctx := sdk.UnwrapSDKContext(goCtx)
 
-	var project = types.Project{
-		Creator:     msg.Creator,
-		Id:          msg.Id,
-		Title:       msg.Title,
-		Description: msg.Description,
-		Start:       msg.Start,
-		End:         msg.End,
-		Goal:        msg.Goal,
-	}
+		var fund = types.Fund{
+			Creator: msg.Creator,
+			Id:      msg.Id,
+			Project: msg.Project,
+			Amount:  msg.Amount,
+		}
 
-	// Checks that the element exists
-	if !k.HasProject(ctx, msg.Id) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %d doesn't exist", msg.Id))
-	}
+		// Checks that the element exists
+		if !k.HasFund(ctx, msg.Id) {
+			return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %d doesn't exist", msg.Id))
+		}
 
-	// Checks if the the msg sender is the same as the current owner
-	if msg.Creator != k.GetProjectOwner(ctx, msg.Id) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
-	}
+		// Checks if the the msg sender is the same as the current owner
+		if msg.Creator != k.GetFundOwner(ctx, msg.Id) {
+			return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
+		}
 
-	k.SetProject(ctx, project)
+		k.SetFund(ctx, fund)
 
-	return &types.MsgUpdateProjectResponse{}, nil
+		return &types.MsgUpdateFundResponse{}, nil
+	*/
 }
 
 func (k msgServer) DeleteProject(goCtx context.Context, msg *types.MsgDeleteProject) (*types.MsgDeleteProjectResponse, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
+	return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "Cannot delete project!")
+	/*
+		ctx := sdk.UnwrapSDKContext(goCtx)
+		if !k.HasProject(ctx, msg.Id) {
+			return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %d doesn't exist", msg.Id))
+		}
+		if msg.Creator != k.GetProjectOwner(ctx, msg.Id) {
+			return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
+		}
 
-	if !k.HasProject(ctx, msg.Id) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %d doesn't exist", msg.Id))
-	}
-	if msg.Creator != k.GetProjectOwner(ctx, msg.Id) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
-	}
+		k.RemoveProject(ctx, msg.Id)
 
-	k.RemoveProject(ctx, msg.Id)
-
-	return &types.MsgDeleteProjectResponse{}, nil
+		return &types.MsgDeleteProjectResponse{}, nil
+	*/
 }

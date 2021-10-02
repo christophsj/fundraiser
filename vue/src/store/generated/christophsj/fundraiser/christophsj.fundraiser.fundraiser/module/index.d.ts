@@ -1,12 +1,12 @@
 import { StdFee } from "@cosmjs/launchpad";
 import { OfflineSigner, EncodeObject } from "@cosmjs/proto-signing";
 import { Api } from "./rest";
-import { MsgCreateProject } from "./types/fundraiser/tx";
-import { MsgDeleteProject } from "./types/fundraiser/tx";
-import { MsgUpdateProject } from "./types/fundraiser/tx";
-import { MsgCreateFund } from "./types/fundraiser/tx";
-import { MsgDeleteFund } from "./types/fundraiser/tx";
 import { MsgUpdateFund } from "./types/fundraiser/tx";
+import { MsgCreateProject } from "./types/fundraiser/tx";
+import { MsgCreateFund } from "./types/fundraiser/tx";
+import { MsgUpdateProject } from "./types/fundraiser/tx";
+import { MsgDeleteFund } from "./types/fundraiser/tx";
+import { MsgDeleteProject } from "./types/fundraiser/tx";
 interface TxClientOptions {
     addr: string;
 }
@@ -16,12 +16,12 @@ interface SignAndBroadcastOptions {
 }
 declare const txClient: (wallet: OfflineSigner, { addr: addr }?: TxClientOptions) => Promise<{
     signAndBroadcast: (msgs: EncodeObject[], { fee, memo }: SignAndBroadcastOptions) => Promise<import("@cosmjs/stargate").BroadcastTxResponse>;
-    msgCreateProject: (data: MsgCreateProject) => EncodeObject;
-    msgDeleteProject: (data: MsgDeleteProject) => EncodeObject;
-    msgUpdateProject: (data: MsgUpdateProject) => EncodeObject;
-    msgCreateFund: (data: MsgCreateFund) => EncodeObject;
-    msgDeleteFund: (data: MsgDeleteFund) => EncodeObject;
     msgUpdateFund: (data: MsgUpdateFund) => EncodeObject;
+    msgCreateProject: (data: MsgCreateProject) => EncodeObject;
+    msgCreateFund: (data: MsgCreateFund) => EncodeObject;
+    msgUpdateProject: (data: MsgUpdateProject) => EncodeObject;
+    msgDeleteFund: (data: MsgDeleteFund) => EncodeObject;
+    msgDeleteProject: (data: MsgDeleteProject) => EncodeObject;
 }>;
 interface QueryClientOptions {
     addr: string;
