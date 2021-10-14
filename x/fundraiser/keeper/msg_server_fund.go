@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"strconv"
-	"time"
 
 	"github.com/christophsj/fundraiser/x/fundraiser/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -80,60 +79,71 @@ func (k msgServer) DeleteFund(goCtx context.Context, msg *types.MsgDeleteFund) (
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
 	}
 
+	var logger = ctx.Logger()
+	logger.Error("Request delete of fund %d", msg.Id)
+
 	var fund = k.GetFund(ctx, msg.Id)
 	fundId, _ := strconv.ParseUint(string(fund.Project), 10, 64)
 
-	var fundraiser = k.GetProject(ctx, fundId)
-	now := ctx.BlockTime().UTC()
-	projectEndTime, timeParseErr := time.Parse("2006-01-02T15:04:05.000Z", fundraiser.End)
+	var project = k.GetProject(ctx, fundId)
+	// project does not exist (anymore)
+	if project.Creator != "" {
+		now := ctx.BlockTime().UTC()
+		projectEndTime, parseDateErr := parseDate(project.End)
 
-	if timeParseErr != nil {
-		panic(timeParseErr)
-	}
+		if parseDateErr != nil {
+			logger.Error("Error parsing end date: %s", project.End)
+			panic(ctx)
+		}
 
-	var logger = ctx.Logger()
-	if now.Before(projectEndTime) {
-		logger.Info("Tried to withdraw before deadline")
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "cannot withdraw fund before deadline")
-	} else {
-		logger.Info("Get all Funds to determine whether goal was hit")
-		var x = k.GetAllFund(ctx)
-		var collected uint64 = 0
-		var fId string = fmt.Sprintf("%d", fundraiser.Id)
-		for _, element := range x {
-
-			if element.Project == fId {
-				collected += getTokensFromString(element.Amount)
+		if now.Before(projectEndTime) {
+			logger.Info("Tried to withdraw before deadline")
+			return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "cannot withdraw fund before deadline")
+		} else {
+			// if goal reached -> withdraw not possible
+			if k.wasGoalHit(ctx, project) {
+				logger.Error("Cannot withdraw from successful fundraiser")
+				return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "cannot withdraw funds from succesful fundraiser")
 			}
 		}
-
-		goalTokens := getTokensFromString(fundraiser.Goal)
-		logger.Info(fmt.Sprintf("Collected: %d\nGoal: %d", collected, goalTokens))
-		// TODO: if goal reached -> withdraw not possible
-		if collected >= goalTokens {
-			logger.Error("Cannot withdraw from successful fundraiser")
-			return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "cannot withdraw funds from succesful fundraiser")
-		}
 	}
 
-	moduleAcct := sdk.AccAddress(crypto.AddressHash([]byte(types.ModuleName)))
-	creator, err := sdk.AccAddressFromBech32(msg.Creator)
-	if err != nil {
-		panic(err)
-	}
-	returnAmount, err := sdk.ParseCoinsNormalized(k.GetFund(ctx, msg.Id).Amount)
-	if err != nil {
-		panic(err)
-	}
-
-	// return original fund
-	sdkError := k.bankKeeper.SendCoins(ctx, moduleAcct, creator, returnAmount)
-	if sdkError != nil {
-		panic(sdkError)
-	}
+	returnFundFromModuleAcc(k.bankKeeper, ctx, msg.Creator, k.GetFund(ctx, fundId).Amount)
 
 	logger.Info("Removing fund.")
 	k.RemoveFund(ctx, msg.Id)
 
 	return &types.MsgDeleteFundResponse{}, nil
+}
+
+func (k msgServer) wasGoalHit(ctx sdk.Context, project types.Project) bool {
+	var logger = ctx.Logger()
+	logger.Info("Get all Funds to determine whether goal was hit")
+	var x = k.GetAllFund(ctx)
+	var collected uint64 = 0
+	var fId string = fmt.Sprintf("%d", project.Id)
+	for _, element := range x {
+
+		if element.Project == fId {
+			val, err := getTokensFromString(element.Amount)
+			if err != nil {
+				logger.Error("Error parsing amount!")
+				logger.Error(err.Error())
+				panic(err)
+			}
+			collected += val
+			logger.Info("Total: %d", collected)
+		}
+	}
+
+	goalTokens, err := getTokensFromString(project.Goal)
+
+	if err != nil {
+		logger.Error("Error parsing goal!")
+		logger.Error(err.Error())
+		panic(err)
+	}
+
+	logger.Info(fmt.Sprintf("Collected: %d\nGoal: %d", collected, goalTokens))
+	return collected >= goalTokens
 }

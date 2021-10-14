@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/christophsj/fundraiser/x/fundraiser/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -10,6 +11,23 @@ import (
 
 func (k msgServer) CreateProject(goCtx context.Context, msg *types.MsgCreateProject) (*types.MsgCreateProjectResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	_, err := parseDate(msg.End)
+	if err != nil {
+		ctx.Logger().Error("Error parsing end date: %s", msg.End)
+		panic(ctx)
+	}
+	_, err = parseDate(msg.Start)
+	if err != nil {
+		ctx.Logger().Error("Error parsing start date: %s", msg.Start)
+		panic(ctx)
+	}
+
+	_, err = getTokensFromString(msg.Goal)
+	if err != nil {
+		ctx.Logger().Error("Error parsing goal tokens: %s", msg.Goal)
+		panic(ctx)
+	}
 
 	id := k.AppendProject(
 		ctx,
@@ -55,18 +73,18 @@ func (k msgServer) UpdateProject(goCtx context.Context, msg *types.MsgUpdateProj
 }
 
 func (k msgServer) DeleteProject(goCtx context.Context, msg *types.MsgDeleteProject) (*types.MsgDeleteProjectResponse, error) {
-	return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "Cannot delete project!")
-	/*
-		ctx := sdk.UnwrapSDKContext(goCtx)
-		if !k.HasProject(ctx, msg.Id) {
-			return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %d doesn't exist", msg.Id))
-		}
-		if msg.Creator != k.GetProjectOwner(ctx, msg.Id) {
-			return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
-		}
 
-		k.RemoveProject(ctx, msg.Id)
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	if !k.HasProject(ctx, msg.Id) {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %d doesn't exist", msg.Id))
+	}
+	if msg.Creator != k.GetProjectOwner(ctx, msg.Id) {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
+	}
 
-		return &types.MsgDeleteProjectResponse{}, nil
-	*/
+	// TODO: return funds
+	k.RemoveProject(ctx, msg.Id)
+
+	return &types.MsgDeleteProjectResponse{}, nil
+
 }
