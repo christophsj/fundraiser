@@ -19,28 +19,15 @@
           id="input-description"
         />
 
-        <label for="input-start">Start date</label>
+        <label for="input-end">Duration (in days)</label>
         <input
-          type="date"
+          type="number"
           class="sp-input"
-          placeholder="YYYY.MM.DD"
-          v-model="start"
-          id="input-start"
-          aria-describedby="date-format"
-          min="2021-06-01"
-          max="2031-01-01"
-        />
-
-        <label for="input-end">End Date</label>
-        <input
-          type="date"
-          class="sp-input"
-          placeholder="YYYY.MM.DD"
-          v-model="end"
-          id="input-end"
-          aria-describedby="date-format"
-          min="2021-06-01"
-          max="2031-01-01"
+          placeholder="number of days"
+          v-model="duration"
+          id="input-duration"
+          min="1"
+          max="90"
         />
 
         <label for="input-goal">Goal (number of tokens)</label>
@@ -51,8 +38,8 @@
           v-model="goal"
           id="input-goal"
         />
-        <sp-button :disabled="!loggedIn" @click="submit">Create Fundraiser</sp-button>
-        <div><strong v-if="!loggedIn">Please access a wallet to create a Fundraiser</strong></div>
+        <sp-button :disabled="!loggedIn" @click="submit">Create Project</sp-button>
+        <div><strong v-if="!loggedIn">Please access a wallet to create a Project</strong></div>
       </form>
     </div>
 </template>
@@ -72,8 +59,7 @@ export default {
     return {
       title: "",
       description: "",
-      start: "",
-      end: "",
+      duration: 30,
       goal: 0,
     };
   },
@@ -99,23 +85,36 @@ export default {
   },
   methods: {
     async submit() {
+      
+      if(this.goal <= 0) {
+        alert("Goal must be > 0!");
+        return;
+      }
 
-      var dateToSeconds = (s) => {
-        var date = new Date(s);
-        return date.getTime() / 1000;
-      };
+      const formatDate = (d) => {
+        const year = d.getFullYear();
+        const month = d.getMonth() + 1;
+        const day = d.getDate();
 
-      var start = dateToSeconds(this.start);
-      var end = dateToSeconds(this.end);
+        // YYYY-MM-DD
+        return `${year}-${month < 10 ? `0${month}` : month}-${day < 10 ? `0${day}` : day}`;
+      }
 
+      const now = new Date();
+      console.debug(`Now: ${now}`);
+      const start = formatDate(now);
+      now.setDate(now.getDate() + this.duration);
+      console.debug(`Now + ${this.duration}: ${now}`);
+      const end = formatDate(now);
       const value = {
         creator: this.currentAccount,
         title: this.title,
         description: this.description,
         start: start,
         end: end,
-        goal: this.goal,
+        goal: `${this.goal}token`,
       };
+      console.debug(`Submit ${JSON.stringify(value)}`)
       await this.$store.dispatch(
         "christophsj.fundraiser.fundraiser/sendMsgCreateProject",
         {

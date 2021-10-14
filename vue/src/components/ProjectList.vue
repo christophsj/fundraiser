@@ -1,6 +1,6 @@
 <template>
   <div class="sp-box sp-shadow column">
-    <h2 class="sp-box-header">FUNDRAISERS</h2>
+    <h2 class="sp-box-header">PROJECTS</h2>
     <div
       v-for="fundraiser in allFundraisers"
       v-bind:key="'fundraiser' + fundraiser.id"
@@ -10,11 +10,11 @@
       <label for="description"><strong>Description:</strong></label>
       <div id="description">{{ fundraiser.description }}</div>
       <label for="start"><strong> Started at: </strong></label>
-      <div id="start">{{ secondsToDateString(fundraiser.start) }}</div>
+      <div id="start">{{ fundraiser.start }}</div>
       <label for="end"><strong>Deadline: </strong></label>
-      <div id="end">{{ secondsToDateString(fundraiser.end) }}</div>
-      <label for="goal"><strong>Goal: </strong></label>
-      <div id="goal">{{ fundSum(fundraiser.id) }} / {{ fundraiser.goal }} Tokens</div>
+      <div id="end">{{ fundraiser.end }}</div>
+      <label for="goal"><strong>Goal status: </strong></label>
+      <div id="goal">{{ fundSum(fundraiser.id) }} / {{ fundraiser.goal }} </div>
 
       <form @submit.prevent="submitFund">
         <div class="subtitle"><strong>Fund Me!</strong></div>
@@ -108,10 +108,10 @@ export default {
       await this.submit(id, `${amount}token`)
     },
     fundSum(id) {
-      return this.funds.filter((x) => x.fundraiserID == id).map(x => x.amount).reduce((a, b) => a + b, 0);
+      return this.funds.filter((x) => x.project == id).map(x => parseInt(x.amount.split("token"))).reduce((a, b) => a + b, 0);
     },
-    async submit(fundraiserID, amount) {
-      const value = { creator: this.currentAccount, fundraiserID, amount };
+    async submit(project, amount) {
+      const value = { creator: this.currentAccount, project, amount };
       console.log(await this.$store.dispatch(
         "christophsj.fundraiser.fundraiser/sendMsgCreateFund",
         {
