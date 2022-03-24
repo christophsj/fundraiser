@@ -1,47 +1,53 @@
 <template>
-    <div class="sp-box sp-shadow sp-form-group column">
-      <form class="sp-voter__main__form">
-        <div class="sp-box-header">Create a Project</div>
+  <div class="sp-box sp-shadow sp-form-group column">
+    <form class="sp-voter__main__form">
+      <div class="sp-box-header">Create a Project</div>
 
-        <label for="input-title">Title</label>
-        <input
-          class="sp-input"
-          placeholder="Enter Title"
-          v-model="title"
-          id="input-title"
-        />
+      <label for="input-title">Title</label>
+      <input
+        class="sp-input"
+        placeholder="Enter Title"
+        v-model="title"
+        id="input-title"
+      />
 
-        <label for="input-description">Description</label>
-        <input
-          class="sp-input"
-          placeholder="Enter Description"
-          v-model="description"
-          id="input-description"
-        />
+      <label for="input-description">Description</label>
+      <input
+        class="sp-input"
+        placeholder="Enter Description"
+        v-model="description"
+        id="input-description"
+      />
 
-        <label for="input-end">Duration (in days)</label>
-        <input
-          type="number"
-          class="sp-input"
-          placeholder="number of days"
-          v-model="duration"
-          id="input-duration"
-          min="1"
-          max="90"
-        />
+      <label for="input-end">Duration (in days)</label>
+      <input
+        type="number"
+        class="sp-input"
+        placeholder="number of days"
+        v-model="duration"
+        id="input-duration"
+        min="1"
+        max="90"
+      />
 
-        <label for="input-goal">Goal (number of tokens)</label>
-        <input
-          type="number"
-          class="sp-input"
-          placeholder="Enter number of tokens"
-          v-model="goal"
-          id="input-goal"
-        />
-        <sp-button :disabled="!loggedIn" @click="submit">Create Project</sp-button>
-        <div><strong v-if="!loggedIn">Please access a wallet to create a Project</strong></div>
-      </form>
-    </div>
+      <label for="input-goal">Goal (number of tokens)</label>
+      <input
+        type="number"
+        class="sp-input"
+        placeholder="Enter number of tokens"
+        v-model="goal"
+        id="input-goal"
+      />
+      <sp-button :disabled="!loggedIn" @click="submit"
+        >Create Project</sp-button
+      >
+      <div>
+        <strong v-if="!loggedIn"
+          >Please access a wallet to create a Project</strong
+        >
+      </div>
+    </form>
+  </div>
 </template>
 
 <style>
@@ -59,7 +65,7 @@ export default {
     return {
       title: "",
       description: "",
-      duration: 30,
+      duration: "30",
       goal: 0,
     };
   },
@@ -85,8 +91,7 @@ export default {
   },
   methods: {
     async submit() {
-      
-      if(this.goal <= 0) {
+      if (this.goal <= 0) {
         alert("Goal must be > 0!");
         return;
       }
@@ -97,15 +102,18 @@ export default {
         const day = d.getDate();
 
         // YYYY-MM-DD
-        return `${year}-${month < 10 ? `0${month}` : month}-${day < 10 ? `0${day}` : day}`;
-      }
+        return `${year}-${month < 10 ? `0${month}` : month}-${
+          day < 10 ? `0${day}` : day
+        }`;
+      };
 
       const now = new Date();
-      console.debug(`Now: ${now}`);
+      console.debug(`Start: ${now}`);
       const start = formatDate(now);
-      now.setDate(now.getDate() + this.duration);
-      console.debug(`Now + ${this.duration}: ${now}`);
-      const end = formatDate(now);
+      const endDate = new Date(now.valueOf());
+      endDate.setDate(endDate.getDate() + parseInt(this.duration));
+      console.debug(`End +${this.duration}: ${endDate}`);
+      const end = formatDate(endDate);
       const value = {
         creator: this.currentAccount,
         title: this.title,
@@ -114,7 +122,7 @@ export default {
         end: end,
         goal: `${this.goal}token`,
       };
-      console.debug(`Submit ${JSON.stringify(value)}`)
+      console.debug(`Submit ${JSON.stringify(value)}`);
       await this.$store.dispatch(
         "christophsj.fundraiser.fundraiser/sendMsgCreateProject",
         {
