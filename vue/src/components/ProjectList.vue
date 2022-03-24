@@ -14,7 +14,7 @@
       <label for="end"><strong>Deadline: </strong></label>
       <div id="end">{{ fundraiser.end }}</div>
       <label for="goal"><strong>Goal status: </strong></label>
-      <div id="goal">{{ fundSum(fundraiser.id) }} / {{ fundraiser.goal }} </div>
+      <div id="goal">{{ fundSum(fundraiser.id) }} / {{ fundraiser.goal.split("token")[0] }} token </div>
 
       <form @submit.prevent="submitFund">
         <div class="subtitle"><strong>Fund Me!</strong></div>
